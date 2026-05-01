@@ -6,10 +6,16 @@ import { formatDistanceToNow } from "date-fns";
 interface NotificationPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  filterTypes?: string[];
 }
 
-export default function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
+export default function NotificationPanel({ isOpen, onClose, filterTypes }: NotificationPanelProps) {
   const { notifications, markAsRead, clearAllNotifications } = useApp();
+
+  // Filter notifications based on filterTypes if provided
+  const filteredNotifications = filterTypes 
+    ? notifications.filter(n => filterTypes.includes(n.type))
+    : notifications;
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -81,14 +87,14 @@ export default function NotificationPanel({ isOpen, onClose }: NotificationPanel
                 </button>
               )}
 
-              {notifications.length === 0 ? (
+              {filteredNotifications.length === 0 ? (
                 <div className="text-center py-12">
                   <Info className="w-12 h-12 text-[#A0A0A0] mx-auto mb-3" />
                   <p className="text-[#A0A0A0]">No notifications</p>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {notifications.map((notification) => (
+                  {filteredNotifications.map((notification) => (
                     <motion.div
                       key={notification.id}
                       initial={{ opacity: 0, y: 20 }}

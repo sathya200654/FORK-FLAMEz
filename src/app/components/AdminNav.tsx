@@ -11,10 +11,10 @@ import {
   UserCog,
   Truck,
   Package,
-  Bell,
+  LogOut,
 } from "lucide-react";
 import { useApp } from "../context/AppContext";
-import NotificationPanel from "./NotificationPanel";
+import { toast } from "sonner";
 
 const navItems = [
   { path: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -32,8 +32,13 @@ const navItems = [
 export default function AdminNav() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { unreadCount } = useApp();
-  const [showNotifications, setShowNotifications] = useState(false);
+  const { setUser } = useApp();
+
+  const handleLogout = () => {
+    setUser(null);
+    toast.success("Logged out successfully!");
+    navigate("/home");
+  };
 
   return (
     <>
@@ -43,17 +48,6 @@ export default function AdminNav() {
             <h1 className="text-3xl font-serif bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] bg-clip-text text-transparent">
               Fork & Flame
             </h1>
-            <button
-              onClick={() => setShowNotifications(true)}
-              className="p-2 hover:bg-[#D4AF37]/20 rounded-lg transition-colors relative"
-            >
-              <Bell className="w-5 h-5 text-[#D4AF37]" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#DC2626] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
           </div>
 
         <nav className="space-y-2">
@@ -76,10 +70,19 @@ export default function AdminNav() {
               </button>
             );
           })}
+
+          <div className="mt-6 pt-6 border-t border-[#D4AF37]/20">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-500/10 transition-all"
+            >
+              <LogOut className="w-5 h-5" />
+              <span>Logout</span>
+            </button>
+          </div>
         </nav>
-      </div>
-    </aside>
-    <NotificationPanel isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
-  </>
+        </div>
+      </aside>
+    </>
   );
 }

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { ArrowLeft, Users, Check } from "lucide-react";
 import { toast } from "sonner";
+import { useApp } from "../../context/AppContext";
 
 const tables = [
   { number: 1, seats: 2, status: "available" },
@@ -19,17 +20,36 @@ const tables = [
 
 export default function TableBooking() {
   const navigate = useNavigate();
+  const { requestTableBooking } = useApp();
   const [selectedTable, setSelectedTable] = useState<number | null>(null);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
+  const [guestCount, setGuestCount] = useState("");
 
   const handleBooking = () => {
-    if (!selectedTable || !date || !time) {
-      toast.error("Please select table, date and time");
+    if (!selectedTable || !date || !time || !guestCount) {
+      toast.error("Please fill in all fields");
       return;
     }
 
-    toast.success("Table booked successfully!");
+    const selectedTableData = tables.find(t => t.number === selectedTable);
+    if (!selectedTableData) {
+      toast.error("Invalid table selection");
+      return;
+    }
+
+    requestTableBooking({
+      userId: "guest-user",
+      userName: "Guest User",
+      tableNumber: selectedTable,
+      seats: selectedTableData.seats,
+      date,
+      time,
+      guestCount: parseInt(guestCount),
+    });
+
+    toast.success("Table booking request sent to admin!");
+    setTimeout(() => navigate("/customer/home"), 2000);
   };
 
   return (
@@ -152,22 +172,40 @@ export default function TableBooking() {
               </div>
 
               <div>
-                <label className="block text-[#A0A0A0] mb-2">Date</label>
+                <label className="block text-[#A0A0A0] mb-2">
+                  Number of Guests
+                </label>
                 <input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="w-full bg-[#0D0D0D]/50 border border-[#D4AF37]/20 rounded-xl p-3 text-[#F5F5F5] focus:border-[#D4AF37] focus:outline-none focus:shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all"
+                  type="number"
+                  min="1"
+                  value={guestCount}
+                  onChange={(e) => setGuestCount(e.target.value)}
+                  placeholder="How many guests?"
+                  className="w-full bg-[#0D0D0D]/50 border border-[#D4AF37]/20 rounded-xl px-4 py-3 text-[#F5F5F5] placeholder:text-[#A0A0A0] focus:border-[#D4AF37] focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-[#A0A0A0] mb-2">Time</label>
+                <label className="block text-[#A0A0A0] mb-2">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="w-full bg-[#0D0D0D]/50 border border-[#D4AF37]/20 rounded-xl px-4 py-3 text-[#F5F5F5] focus:border-[#D4AF37] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[#A0A0A0] mb-2">
+                  Time
+                </label>
                 <input
                   type="time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className="w-full bg-[#0D0D0D]/50 border border-[#D4AF37]/20 rounded-xl p-3 text-[#F5F5F5] focus:border-[#D4AF37] focus:outline-none focus:shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all"
+                  className="w-full bg-[#0D0D0D]/50 border border-[#D4AF37]/20 rounded-xl px-4 py-3 text-[#F5F5F5] focus:border-[#D4AF37] focus:outline-none"
                 />
               </div>
 
@@ -175,9 +213,9 @@ export default function TableBooking() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleBooking}
-                className="w-full bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] text-[#0D0D0D] py-4 rounded-xl hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] transition-all mt-6"
+                className="w-full bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] text-[#0D0D0D] py-3 rounded-xl hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] transition-all font-semibold mt-6"
               >
-                Confirm Booking
+                Request Booking
               </motion.button>
             </div>
           </motion.div>

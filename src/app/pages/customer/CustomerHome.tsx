@@ -9,57 +9,16 @@ import {
   ChefHat,
   Bell,
   CalendarCheck,
+  LogOut,
 } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import NotificationPanel from "../../components/NotificationPanel";
 import UserProfilePanel from "../../components/UserProfilePanel";
-
-const popularDishes = [
-  {
-    id: 1,
-    name: "Butter Chicken",
-    price: 450,
-    rating: 4.8,
-    image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=400",
-    veg: false,
-  },
-  {
-    id: 2,
-    name: "Paneer Tikka",
-    price: 380,
-    rating: 4.7,
-    image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400",
-    veg: true,
-  },
-  {
-    id: 3,
-    name: "Biryani",
-    price: 420,
-    rating: 4.9,
-    image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400",
-    veg: false,
-  },
-  {
-    id: 4,
-    name: "Dal Makhani",
-    price: 320,
-    rating: 4.6,
-    image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400",
-    veg: true,
-  },
-  {
-    id: 5,
-    name: "Tandoori Platter",
-    price: 650,
-    rating: 4.9,
-    image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400",
-    veg: false,
-  },
-];
+import { toast } from "sonner";
 
 export default function CustomerHome() {
   const navigate = useNavigate();
-  const { unreadCount } = useApp();
+  const { unreadCount, setUser, cartItems, menuItems } = useApp();
   const [searchQuery, setSearchQuery] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -70,6 +29,18 @@ export default function CustomerHome() {
       navigate(`/customer/search?q=${searchQuery}`);
     }
   };
+
+  const handleLogout = () => {
+    setUser(null);
+    toast.success("Logged out successfully!");
+    navigate("/home");
+  };
+
+  // Convert menu items to display format with rating
+  const displayDishes = menuItems.map((item, index) => ({
+    ...item,
+    rating: 4.5 + ((index % 5) * 0.1),
+  }));
 
   return (
     <div className="min-h-screen bg-[#0D0D0D]">
@@ -101,15 +72,24 @@ export default function CustomerHome() {
               className="p-2 hover:bg-[#D4AF37]/20 rounded-lg transition-colors relative"
             >
               <ShoppingCart className="w-6 h-6 text-[#D4AF37]" />
-              <span className="absolute -top-1 -right-1 bg-[#D4AF37] text-[#0D0D0D] text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                3
-              </span>
+              {cartItems.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-[#D4AF37] text-[#0D0D0D] text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartItems.length}
+                </span>
+              )}
             </button>
             <button
               onClick={() => setShowProfile(true)}
               className="p-2 hover:bg-[#D4AF37]/20 rounded-lg transition-colors"
             >
               <User className="w-6 h-6 text-[#D4AF37]" />
+            </button>
+            <button
+              onClick={handleLogout}
+              className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
+              title="Logout"
+            >
+              <LogOut className="w-6 h-6 text-red-500" />
             </button>
           </div>
         </div>
@@ -140,7 +120,7 @@ export default function CustomerHome() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            {popularDishes.map((dish, index) => (
+            {displayDishes.map((dish, index) => (
               <motion.div
                 key={dish.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -170,7 +150,7 @@ export default function CustomerHome() {
                     <span className="text-[#D4AF37] text-xl">₹{dish.price}</span>
                     <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 text-[#D4AF37] fill-[#D4AF37]" />
-                      <span className="text-[#F5F5F5]">{dish.rating}</span>
+                      <span className="text-[#F5F5F5]">{dish.rating.toFixed(1)}</span>
                     </div>
                   </div>
                   <motion.button

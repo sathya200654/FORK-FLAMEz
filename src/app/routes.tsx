@@ -8,6 +8,7 @@ import SearchResults from "./pages/customer/SearchResults";
 import FoodDetail from "./pages/customer/FoodDetail";
 import TableBooking from "./pages/customer/TableBooking";
 import Cart from "./pages/customer/Cart";
+import Payment from "./pages/customer/Payment";
 import OrderTracking from "./pages/customer/OrderTracking";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -57,6 +58,10 @@ export const router = createBrowserRouter([
   {
     path: "/customer/cart",
     Component: Cart,
+  },
+  {
+    path: "/customer/payment",
+    Component: Payment,
   },
   {
     path: "/customer/orders",

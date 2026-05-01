@@ -17,57 +17,47 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useApp } from "../../context/AppContext";
 import AdminNav from "../../components/AdminNav";
 
-const salesData = [
-  { name: "Mon", sales: 4200 },
-  { name: "Tue", sales: 5300 },
-  { name: "Wed", sales: 4800 },
-  { name: "Thu", sales: 6200 },
-  { name: "Fri", sales: 7500 },
-  { name: "Sat", sales: 8900 },
-  { name: "Sun", sales: 7200 },
-];
-
-const revenueData = [
-  { name: "Jan", revenue: 45000 },
-  { name: "Feb", revenue: 52000 },
-  { name: "Mar", revenue: 48000 },
-  { name: "Apr", revenue: 61000 },
-];
-
-const stats = [
-  {
-    label: "Total Sales",
-    value: "₹1,24,500",
-    change: "+12.5%",
-    icon: DollarSign,
-    color: "from-[#D4AF37] to-[#F4D03F]",
-  },
-  {
-    label: "Orders Today",
-    value: "48",
-    change: "+8.2%",
-    icon: ShoppingBag,
-    color: "from-[#10B981] to-[#34D399]",
-  },
-  {
-    label: "Active Tables",
-    value: "12/20",
-    change: "60%",
-    icon: Table2,
-    color: "from-[#F59E0B] to-[#FBBF24]",
-  },
-  {
-    label: "Total Customers",
-    value: "1,245",
-    change: "+5.4%",
-    icon: Users,
-    color: "from-[#8B5CF6] to-[#A78BFA]",
-  },
-];
-
 export default function AdminDashboard() {
+  const { getDashboardStats, getWeeklyAnalytics } = useApp();
+  const stats_data = getDashboardStats();
+  const weeklyData = getWeeklyAnalytics();
+
+  const stats = [
+    {
+      label: "Total Sales",
+      value: `₹${stats_data.totalSales.toLocaleString()}`,
+      change: "+12.5%",
+      icon: DollarSign,
+      color: "from-[#D4AF37] to-[#F4D03F]",
+    },
+    {
+      label: "Orders Today",
+      value: stats_data.ordersToday.toString(),
+      change: "+8.2%",
+      icon: ShoppingBag,
+      color: "from-[#10B981] to-[#34D399]",
+    },
+    {
+      label: "Active Tables",
+      value: `${stats_data.activeTables}/20`,
+      change: `${Math.round((stats_data.activeTables / 20) * 100)}%`,
+      icon: Table2,
+      color: "from-[#F59E0B] to-[#FBBF24]",
+    },
+    {
+      label: "Total Customers",
+      value: stats_data.totalCustomers.toLocaleString(),
+      change: "+5.4%",
+      icon: Users,
+      color: "from-[#8B5CF6] to-[#A78BFA]",
+    },
+  ];
+
+  const salesData = weeklyData.map(item => ({ name: item.date, sales: item.sales }));
+  const revenueData = weeklyData.map(item => ({ name: item.date, revenue: item.sales }));
   return (
     <div className="flex min-h-screen bg-[#0D0D0D]">
       <AdminNav />

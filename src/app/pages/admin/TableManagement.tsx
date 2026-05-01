@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { Users, ToggleLeft, ToggleRight } from "lucide-react";
+import { Users, ToggleLeft, ToggleRight, Check, X } from "lucide-react";
 import { toast } from "sonner";
+import { useApp } from "../../context/AppContext";
 import AdminNav from "../../components/AdminNav";
 
 const tablesData = [
@@ -20,6 +21,7 @@ const tablesData = [
 ];
 
 export default function TableManagement() {
+  const { tableBookings, approveTableBooking, rejectTableBooking } = useApp();
   const [tables, setTables] = useState(tablesData);
   const [autoAssign, setAutoAssign] = useState(true);
 
@@ -32,6 +34,9 @@ export default function TableManagement() {
     toast.success(`Table ${number} marked as ${newStatus}`);
   };
 
+  const pendingBookings = tableBookings.filter(b => b.status === "pending");
+  const approvedBookings = tableBookings.filter(b => b.status === "approved");
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "available":
@@ -43,6 +48,16 @@ export default function TableManagement() {
       default:
         return "bg-[#2A2A2A] border-[#A0A0A0]/50 text-[#A0A0A0]";
     }
+  };
+
+  const handleApprove = (id: string) => {
+    approveTableBooking(id);
+    toast.success("Booking approved!");
+  };
+
+  const handleReject = (id: string) => {
+    rejectTableBooking(id);
+    toast.error("Booking rejected");
   };
 
   return (
@@ -80,7 +95,11 @@ export default function TableManagement() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.05 }}
-                className={`aspect-square rounded-2xl p-4 flex flex-col items-center justify-center gap-3 border-2 transition-all hover:scale-105 ${getStatusColor(table.status)}`}
+                className={`aspect-square rounded-2xl p-4 flex flex-col items-center justify-center gap-3 border-2 transition-all hover:scale-105 cursor-pointer ${getStatusColor(table.status)}`}
+                onClick={() => {
+                  const nextStatus = table.status === "available" ? "occupied" : table.status === "occupied" ? "reserved" : "available";
+                  updateStatus(table.number, nextStatus);
+                }}
               >
                 <span className="text-3xl">T{table.number}</span>
                 <div className="flex items-center gap-1">
@@ -94,7 +113,7 @@ export default function TableManagement() {
             ))}
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -135,22 +154,95 @@ export default function TableManagement() {
               className="bg-[#1A1A1A]/50 backdrop-blur-sm border border-[#F59E0B]/30 rounded-2xl p-6"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl text-[#F5F5F5]">Reserved</h3>
+                <h3 className="text-xl text-[#F5F5F5]">Pending Requests</h3>
                 <div className="w-12 h-12 rounded-xl bg-[#F59E0B]/20 flex items-center justify-center">
-                  <span className="text-2xl text-[#F59E0B]">
-                    {tables.filter((t) => t.status === "reserved").length}
-                  </span>
+                  <span className="text-2xl text-[#F59E0B]">{pendingBookings.length}</span>
                 </div>
               </div>
-              <p className="text-[#A0A0A0]">Upcoming bookings</p>
+              <p className="text-[#A0A0A0]">Awaiting approval</p>
             </motion.div>
           </div>
+
+          {/* Pending Booking Requests */}
+          {pendingBookings.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="mb-8 bg-[#1A1A1A]/50 backdrop-blur-sm border border-[#D4AF37]/20 rounded-2xl p-6"
+            >
+              <h2 className="text-2xl text-[#F5F5F5] mb-4">Booking Requests</h2>
+              <div className="space-y-3">
+                {pendingBookings.map((booking) => (
+                  <div
+                    key={booking.id}
+                    className="bg-[#0D0D0D]/50 border border-[#D4AF37]/30 rounded-xl p-4 flex items-center justify-between"
+                  >
+                    <div className="flex-1">
+                      <p className="text-[#F5F5F5] font-semibold">
+                        {booking.userName} - Table {booking.tableNumber}
+                      </p>
+                      <p className="text-[#A0A0A0] text-sm">
+                        {booking.guestCount} guests • {booking.date} at {booking.time}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleApprove(booking.id)}
+                        className="p-2 bg-[#10B981]/20 text-[#10B981] rounded-lg hover:bg-[#10B981]/30 transition-colors"
+                      >
+                        <Check className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => handleReject(booking.id)}
+                        className="p-2 bg-[#DC2626]/20 text-[#DC2626] rounded-lg hover:bg-[#DC2626]/30 transition-colors"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Approved Bookings */}
+          {approvedBookings.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="mb-8 bg-[#1A1A1A]/50 backdrop-blur-sm border border-[#10B981]/20 rounded-2xl p-6"
+            >
+              <h2 className="text-2xl text-[#F5F5F5] mb-4">Approved Bookings</h2>
+              <div className="space-y-3">
+                {approvedBookings.map((booking) => (
+                  <div
+                    key={booking.id}
+                    className="bg-[#0D0D0D]/50 border border-[#10B981]/30 rounded-xl p-4 flex items-center justify-between"
+                  >
+                    <div className="flex-1">
+                      <p className="text-[#F5F5F5] font-semibold">
+                        {booking.userName} - Table {booking.tableNumber}
+                      </p>
+                      <p className="text-[#A0A0A0] text-sm">
+                        {booking.guestCount} guests • {booking.date} at {booking.time}
+                      </p>
+                    </div>
+                    <div className="bg-[#10B981]/20 text-[#10B981] px-3 py-1 rounded-full text-sm">
+                      Confirmed
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mt-8 bg-[#1A1A1A]/50 backdrop-blur-sm border border-[#D4AF37]/20 rounded-2xl p-6"
+            transition={{ delay: 0.5 }}
+            className="bg-[#1A1A1A]/50 backdrop-blur-sm border border-[#D4AF37]/20 rounded-2xl p-6"
           >
             <h2 className="text-2xl text-[#F5F5F5] mb-4">Quick Actions</h2>
             <div className="grid md:grid-cols-3 gap-3">
