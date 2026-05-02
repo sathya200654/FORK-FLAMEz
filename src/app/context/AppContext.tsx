@@ -94,12 +94,30 @@ export function AppProvider({ children }: { children: ReactNode }) {
     // Initialize from localStorage or defaults
     try {
       const saved = localStorage.getItem("menuItems");
-      return saved ? JSON.parse(saved) : [
-        { id: 1, name: "Butter Chicken", description: "Tender chicken in creamy tomato sauce", price: 450, category: "Main Course", veg: false, available: true, image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect fill='%23D4431C' width='300' height='300'/%3E%3Ctext x='50%25' y='50%25' font-size='24' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='Arial'%3EButter Chicken%3C/text%3E%3C/svg%3E" },
-        { id: 2, name: "Paneer Tikka", description: "Marinated cottage cheese grilled to perfection", price: 380, category: "Appetizer", veg: true, available: true, image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect fill='%23F4A460' width='300' height='300'/%3E%3Ctext x='50%25' y='50%25' font-size='24' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='Arial'%3EPaneer Tikka%3C/text%3E%3C/svg%3E" },
-        { id: 3, name: "Biryani", description: "Fragrant rice cooked with spiced meat", price: 420, category: "Main Course", veg: false, available: true, image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect fill='%23CD853F' width='300' height='300'/%3E%3Ctext x='50%25' y='50%25' font-size='24' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='Arial'%3EBiryani%3C/text%3E%3C/svg%3E" },
-        { id: 4, name: "Dal Makhani", description: "Creamy lentils cooked with butter and cream", price: 320, category: "Main Course", veg: true, available: true, image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect fill='%238B4513' width='300' height='300'/%3E%3Ctext x='50%25' y='50%25' font-size='24' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='Arial'%3EDal Makhani%3C/text%3E%3C/svg%3E" },
-        { id: 5, name: "Tandoori Platter", description: "Mixed tandoori delights with multiple protein options", price: 650, category: "Main Course", veg: false, available: true, image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect fill='%23DC143C' width='300' height='300'/%3E%3Ctext x='50%25' y='50%25' font-size='24' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='Arial'%3ETandoori Platter%3C/text%3E%3C/svg%3E" },
+      const fallbackImage = "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&auto=format&fit=crop";
+      const imageMap: Record<string, string> = {
+        "Butter Chicken": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=800&auto=format&fit=crop",
+        "Paneer Tikka": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800&auto=format&fit=crop",
+        "Biryani": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop",
+        "Dal Makhani": "https://images.unsplash.com/photo-1543353071-873f17a7a088?w=800&auto=format&fit=crop",
+        "Tandoori Platter": "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&auto=format&fit=crop",
+      };
+      const normalizeImage = (item: MenuItem) => {
+        if (
+          typeof item.image !== "string" ||
+          item.image.startsWith("data:image/svg+xml") ||
+          item.image.includes("via.placeholder.com")
+        ) {
+          return { ...item, image: imageMap[item.name] || fallbackImage };
+        }
+        return item;
+      };
+      return saved ? JSON.parse(saved).map(normalizeImage) : [
+        { id: 1, name: "Butter Chicken", description: "Tender chicken in creamy tomato sauce", price: 450, category: "Main Course", veg: false, available: true, image: imageMap["Butter Chicken"] },
+        { id: 2, name: "Paneer Tikka", description: "Marinated cottage cheese grilled to perfection", price: 380, category: "Appetizer", veg: true, available: true, image: imageMap["Paneer Tikka"] },
+        { id: 3, name: "Biryani", description: "Fragrant rice cooked with spiced meat", price: 420, category: "Main Course", veg: false, available: true, image: imageMap["Biryani"] },
+        { id: 4, name: "Dal Makhani", description: "Creamy lentils cooked with butter and cream", price: 320, category: "Main Course", veg: true, available: true, image: imageMap["Dal Makhani"] },
+        { id: 5, name: "Tandoori Platter", description: "Mixed tandoori delights with multiple protein options", price: 650, category: "Main Course", veg: false, available: true, image: imageMap["Tandoori Platter"] },
       ];
     } catch {
       return [];

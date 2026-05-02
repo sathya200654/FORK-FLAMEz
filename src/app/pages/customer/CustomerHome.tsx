@@ -14,6 +14,7 @@ import {
 import { useApp } from "../../context/AppContext";
 import NotificationPanel from "../../components/NotificationPanel";
 import UserProfilePanel from "../../components/UserProfilePanel";
+import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 import { toast } from "sonner";
 
 export default function CustomerHome() {
@@ -131,7 +132,7 @@ export default function CustomerHome() {
                 className="cursor-pointer bg-[#1A1A1A]/50 backdrop-blur-sm border border-[#D4AF37]/20 rounded-2xl overflow-hidden hover:border-[#D4AF37] hover:shadow-[0_0_30px_rgba(212,175,55,0.2)] transition-all group"
               >
                 <div className="relative h-48 overflow-hidden">
-                  <img
+                  <ImageWithFallback
                     src={dish.image}
                     alt={dish.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useApp } from "../../context/AppContext";
+import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 
 export default function FoodDetail() {
   const navigate = useNavigate();
@@ -78,7 +79,7 @@ export default function FoodDetail() {
             animate={{ opacity: 1, x: 0 }}
             className="relative h-96 md:h-full rounded-2xl overflow-hidden border border-[#D4AF37]/30"
           >
-            <img
+            <ImageWithFallback
               src={dish.image}
               alt={dish.name}
               className="w-full h-full object-cover"

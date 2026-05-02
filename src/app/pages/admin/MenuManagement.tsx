@@ -4,6 +4,7 @@ import { Plus, Edit, Trash2, Upload, ToggleLeft, ToggleRight } from "lucide-reac
 import { toast } from "sonner";
 import { useApp } from "../../context/AppContext";
 import AdminNav from "../../components/AdminNav";
+import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 
 export default function MenuManagement() {
   const { menuItems, addMenuItem, updateMenuItem, removeMenuItem, toggleMenuItemAvailability } = useApp();
@@ -15,7 +16,7 @@ export default function MenuManagement() {
     price: "",
     category: "Appetizer",
     veg: false,
-    image: "https://via.placeholder.com/200x200?text=New+Dish",
+    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&auto=format&fit=crop",
   });
 
   const handleOpenModal = (itemId?: number) => {
@@ -40,7 +41,7 @@ export default function MenuManagement() {
         price: "",
         category: "Appetizer",
         veg: false,
-        image: "https://via.placeholder.com/200x200?text=New+Dish",
+        image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&auto=format&fit=crop",
       });
     }
     setShowModal(true);
@@ -125,7 +126,7 @@ export default function MenuManagement() {
                 className="bg-[#1A1A1A]/50 backdrop-blur-sm border border-[#D4AF37]/20 rounded-2xl overflow-hidden hover:border-[#D4AF37] transition-all"
               >
                 <div className="relative h-48">
-                  <img
+                  <ImageWithFallback
                     src={item.image}
                     alt={item.name}
                     className="w-full h-full object-cover"

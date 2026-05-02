@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { ArrowLeft, Trash2, Plus, Minus } from "lucide-react";
 import { toast } from "sonner";
 import { useApp } from "../../context/AppContext";
+import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -85,7 +86,7 @@ export default function Cart() {
                   className="bg-[#1A1A1A]/50 backdrop-blur-sm border border-[#D4AF37]/20 rounded-2xl p-4 hover:border-[#D4AF37] transition-all"
                 >
                   <div className="flex gap-4">
-                    <img
+                    <ImageWithFallback
                       src={item.image}
                       alt={item.name}
                       className="w-24 h-24 object-cover rounded-xl"
